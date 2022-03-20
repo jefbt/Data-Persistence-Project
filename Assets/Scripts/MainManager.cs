@@ -12,6 +12,8 @@ public class MainManager : MonoBehaviour
 
     public Text ScoreText;
     public GameObject GameOverText;
+
+    public Text BestScoreText;
     
     private bool m_Started = false;
     private int m_Points;
@@ -36,13 +38,15 @@ public class MainManager : MonoBehaviour
                 brick.onDestroyed.AddListener(AddPoint);
             }
         }
+
+        BestScoreText.text = $"Best Score: {ScoreTracker.GetBestScoreNames()[0]} : {ScoreTracker.GetBestScoreValues()[0]}";
     }
 
     private void Update()
     {
         if (!m_Started)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
             {
                 m_Started = true;
                 float randomDirection = Random.Range(-1.0f, 1.0f);
@@ -55,16 +59,17 @@ public class MainManager : MonoBehaviour
         }
         else if (m_GameOver)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
+            if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0))
             {
-                SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                //SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+                ScoreTracker.GoToBestScoreScreen();
             }
         }
     }
 
     void AddPoint(int point)
     {
-        m_Points += point;
+        m_Points += point * (ScoreTracker.GetDifficulty() + 1);
         ScoreText.text = $"Score : {m_Points}";
     }
 
@@ -72,5 +77,6 @@ public class MainManager : MonoBehaviour
     {
         m_GameOver = true;
         GameOverText.SetActive(true);
+        ScoreTracker.SetPlayerScore(m_Points);
     }
 }
